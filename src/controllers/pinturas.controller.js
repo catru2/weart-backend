@@ -8,14 +8,28 @@ const { uploadImage } = require("../configs/cloudinary.config")
 
 const index = async (req, res) => {
     try{
-        const {limit,page}= req.query
-        const {sort,order}=req.query
-        
-        const usuarios = await Pintura.getAll();
-        return res.status(200).json({
+        const limit= parent(req.query.limit)
+        const page = parent(req.query.page)
+        const offset = (page - 1) * limit
+        const {sort,order} = req.query
+
+        const usuarios = await Pintura.getAll({limit,offset},{sort,order});
+
+        let response = {
             message: "pinturas obtenidas correctamente",
             data: usuarios
-        })
+        }
+        if(page && limit){
+            const totalPinturas = await Pintura.count()
+            response = {
+                ...response,
+                total:  totalPinturas,
+                totalPages: Math.ceil(totalPinturas / limit),
+                currentPage: page,
+            }
+        }
+        
+        return res.status(200).json(response)
     }catch(error){
         return res.status(500).json({
         message: "error al obtener datos",

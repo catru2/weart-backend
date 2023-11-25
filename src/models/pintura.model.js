@@ -17,13 +17,26 @@ class Pintura{
         this.deleted= deleted;
       }
       
-      static async getAll() {
+      static async getAll({limit,offset},{sort,order}) {
         const connection = await db.createConnection();
-        const [rows] = await connection.query(
-          "SELECT id_pintura,id_usuario,titulo,descripcion,imagen,created_at,created_by, created_at ,updated_by,updated_at FROM pinturas WHERE deleted=0 ;"
-        );
+        const query = "SELECT id_pintura,id_usuario,titulo,descripcion,imagen,created_at,created_by, created_at ,updated_by,updated_at FROM pinturas WHERE deleted=0 "
+        if(sort && order){
+          query += `ORDER BY ${sort} ${order}`
+        }
+        if(limit && offset){
+          query += `LIMIT ${limit} OFFSET ${offset}`
+        }
+        const [rows] = await connection.query(query);
         connection.end();
         return rows;
+      }
+      static async count(){
+        const connection = await db.createConnection();
+        const [rows] = await connection.query(
+          "SELECT COUNT(*) as count FROM pinturas WHERE deleted=0 ;"
+        );
+        connection.end();
+        return rows[0].count;
       }
 
 

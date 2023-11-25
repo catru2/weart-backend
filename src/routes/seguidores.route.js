@@ -4,9 +4,9 @@ const  verifyToken  = require("../middlewares/auth.middleware")
 
 const router=express.Router()
 
-router.get("/seguidores",verifyToken,seguidoresController.index)
-router.get("/seguidores/:id",verifyToken,seguidoresController.getById)
-router.post("/seguidores/:id", seguidoresController.crearseguidor)
-router.delete("/seguidores/:id",verifyToken,seguidoresController.delete)
+router.get("/",verifyToken,seguidoresController.index)
+router.get("/:id",verifyToken,seguidoresController.getById)
+router.post("/:id", seguidoresController.crearseguidor)
+router.delete("/:id",verifyToken,seguidoresController.delete)
 
 module.exports=router

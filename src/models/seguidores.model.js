@@ -2,7 +2,8 @@ const db= require("../configs/ConfiDB")
 
 
 class Seguidores{
-    constructor({id_seguido,id_usuario,created_by,fecha_seguido,updated_by,updated_at,deleted_by,deleted_at,deleted }){
+    constructor({id_seguidor,id_seguido,id_usuario,created_by,fecha_seguido,updated_by,updated_at,deleted_by,deleted_at,deleted }){
+             this.id_seguidor=id_seguidor;
              this.id_seguido=id_seguido;
              this.id_usuario=id_usuario;
              this.created_by=created_by;
@@ -46,16 +47,16 @@ class Seguidores{
 
     async save(){
         const connection = await db.createConnection();
-        const [result]= await connection.execute("INSERT INTO seguidores(id_usuario,created_by,fecha_seguido) VALUES(?,?,?)",
-        [this.id_usuario,this.created_by,this.fecha_seguido]
-        );
+        const [result]= await connection.execute("INSERT INTO seguidores(id_usuario,id_seguido,created_by,created_at) VALUES(?,?,?,?)",
+        [this.id_usuario,this.id_seguido,this.created_by,this.fecha_seguido]);
         connection.end();
         if(result.insertId==0){
            throw new Error("no se pudo crear al seguidor")
-
         }
-        this.id = result.insertId;
+        this.id_seguidor = result.insertId;
     }
+
+
     static async deleteFisico(id){
        const connection = await db.createConnection();
        const [result]= await connection.execute("DELETE FROM seguidores WHERE id_seguido=?",[id]);
@@ -65,6 +66,8 @@ class Seguidores{
       }
       return;
     }
+
+
     static async deleteLogico(seguidor){
         const connection = await db.createConnection();
         const  deleted_at = new Date();
@@ -89,5 +92,7 @@ class Seguidores{
      }
      return;
    }
+
+
 }
 module.exports=Seguidores;

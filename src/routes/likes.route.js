@@ -4,10 +4,10 @@ const verifyToken = require("../middlewares/auth.middleware");
 
 const router=express.Router()
 
-router.get("/likes", likeController.index)
-router.get("/likes/:id",verifyToken,likeController.getById)
-router.post("/likes/:id",verifyToken, likeController.createLike)
-router.delete("/likes/:id",verifyToken, likeController.delete)
-router.put("/pinturas/:id",verifyToken, likeController.update)
+router.get("/", likeController.index)
+router.get("/:id",verifyToken,likeController.getById)
+router.post("/:id",verifyToken, likeController.createLike)
+router.delete("/:id",verifyToken, likeController.delete)
+router.put("/:id",verifyToken, likeController.update)
 
 module.exports=router

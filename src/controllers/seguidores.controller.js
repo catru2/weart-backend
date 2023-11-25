@@ -43,7 +43,8 @@ const crearseguidor = async (req,res)=>{
      const decoded= jwt.verify(token,process.env.SECRET_NAME)
      console.log(decoded)
      const seguidores= new Seguidores({
-        id_usuario: req.params.id,
+        id_seguido: req.params.id,
+        id_usuario:decoded.id,
         created_by:decoded.id,
         fecha_seguido: new Date()
      })
@@ -58,8 +59,8 @@ const crearseguidor = async (req,res)=>{
             error:error.message
            })
     }
-
 }
+
 const deleteFisico = async (req,res) =>{
     try{
         const id_seguido = req.params.id;

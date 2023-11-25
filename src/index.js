@@ -21,8 +21,11 @@ app.use(fileUpload({
 
 app.use(express.urlencoded({extended:false}))
 
-    app.use("/api",userRoute,authRoutes,pinturaRoute,seguidoresRoute,likesRoutes)
-
+app.use("/usuarios",userRoute)
+app.use("/likes",likesRoutes)
+app.use("/pinturas",pinturaRoute)
+app.use("/seguidores",seguidoresRoute)
+app.use("/auth",authRoutes)
 
 
 

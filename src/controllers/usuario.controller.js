@@ -1,7 +1,6 @@
 require("dotenv").config();
 const User = require("../models/user.model");
 const bcrypt = require("bcrypt");
-const { request } = require("express");
 const saltos = process.env.SALTOS;
 
 //1
@@ -23,7 +22,6 @@ const index = async (req, res) => {
 //2
 const createUser = async (req,res) =>{
     try{
-        console.log(req.body)
         const usuario = new User({
             nombre: req.body.nombre,
             correo:req.body.correo,

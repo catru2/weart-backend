@@ -47,12 +47,27 @@ class Seguidores{
 
     async save(){
         const connection = await db.createConnection();
+
+        const [rows] = await connection.query("SELECT id_usuario, id_seguido FROM seguidores WHERE id_usuario = ? AND id_seguido = ?",[this.id_usuario,this.id_seguido]);
+        if(rows.length > 0){
+            throw new Error("El seguidor ya esta agregado")
+        }
+        const rows2 = await connection.query("SELECT id_usuario FROM usuarios WHERE id_usuario = ? AND deleted = 0",[this.id_seguido]);
+        if(rows2[0].length == 0){
+            throw new Error("El usuario no existe")
+        }
+
+        
         const [result]= await connection.execute("INSERT INTO seguidores(id_usuario,id_seguido,created_by,created_at) VALUES(?,?,?,?)",
         [this.id_usuario,this.id_seguido,this.created_by,this.fecha_seguido]);
+
+
         connection.end();
+
         if(result.insertId==0){
            throw new Error("no se pudo crear al seguidor")
         }
+
         this.id_seguidor = result.insertId;
     }
 

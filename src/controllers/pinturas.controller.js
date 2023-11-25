@@ -8,6 +8,9 @@ const { uploadImage } = require("../configs/cloudinary.config")
 
 const index = async (req, res) => {
     try{
+        const {limit,page}= req.query
+        const {sort,order}=req.query
+        
         const usuarios = await Pintura.getAll();
         return res.status(200).json({
             message: "pinturas obtenidas correctamente",

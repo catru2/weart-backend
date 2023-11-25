@@ -110,12 +110,14 @@ const deleteFisico = async (req,res) =>{
         })
     }
 }
+
 const updateId = async (req,res)=>{
     try{
      const token=req.headers.token
-     const decoded= jwt.verify(token,process.env.SECRET_NAME)
-     const seguidor={
+     const decoded= Seguidores.obtenerIdToken(token)
+     const seguidor = {
         updated_by:decoded.id,
+        id_usuario:decoded.id,
         id_seguido:req.params.id
      }
      await Seguidores.update(seguidor)
@@ -128,15 +130,16 @@ const updateId = async (req,res)=>{
             error:error.message
         })
     }
-
 }
+
 const deleteLogico = async (req,res)=>{
     try{
         const token=req.headers.token
-        const decoded = jwt.verify(token, process.env.SECRET_NAME)
+        const decoded = Seguidores.obtenerIdToken(token)
         const seguidor={
-            update_by:decoded.id,
-            id_usuario:req.params.id
+            deleted_by:decoded.id,
+            id_usuario:decoded.id,
+            id_seguido:req.params.id
         }
         await Seguidores.deleteLogico(seguidor)
         return res.status(200).json({
@@ -159,5 +162,6 @@ module.exports={
     crearseguidor,
     getById,
     delete:deleteLogico,
-    getCountSeguidores
+    getCountSeguidores,
+    updateId
 }

@@ -1,14 +1,13 @@
 const db= require("../configs/ConfiDB");
 const bcrypt = require("bcrypt");
 class Pintura{
-    constructor({ id_pintura,id_usuario,titulo,descripcion, imagen,fecha_pintura,likes,created_by, created_at ,updated_by,updated_at,deleted_by,deleted_at,deleted }) {
+    constructor({ id_pintura,id_usuario,titulo,descripcion, imagen,fecha_pintura,created_by, created_at ,updated_by,updated_at,deleted_by,deleted_at,deleted }) {
         this.id_pintura=id_pintura;
         this.id_usuario = id_usuario;
         this.titulo=titulo;
         this.descripcion = descripcion;
         this.imagen = imagen;
         this.fecha_pintura= fecha_pintura;
-        this.likes = likes;
         this.created_by = created_by;
         this.created_at = created_at;
         this.updated_by= updated_by;
@@ -21,7 +20,7 @@ class Pintura{
       static async getAll() {
         const connection = await db.createConnection();
         const [rows] = await connection.query(
-          "SELECT id_pintura,id_usuario,titulo,descripcion,imagen,fecha_pintura,likes,created_by, created_at ,updated_by,updated_at,deleted_by,deleted_at,deleted FROM pinturas WHERE deleted=0 ;"
+          "SELECT id_pintura,id_usuario,titulo,descripcion,imagen,created_at,created_by, created_at ,updated_by,updated_at FROM pinturas WHERE deleted=0 ;"
         );
         connection.end();
         return rows;

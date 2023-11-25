@@ -21,7 +21,7 @@ class Seguidores{
         
         return rows;
       }
-      
+
       static async getSeguidores(id){
         const connection=  await db.createConnection();
         const [rows] = await connection.query("SELECT id_seguidor,id_seguido,id_usuario,created_at,created_by,updated_by,updated_at,deleted_by,deleted_at,deleted FROM seguidores WHERE deleted=0 AND id_seguido = ?",[id]);
@@ -41,13 +41,14 @@ class Seguidores{
 
      static async getById(id){
        const connection = await db.createConnection();
-       const [rows] = await connection.query("SELECT id_seguido,id_usuario,fecha_seguido,created_by,updated_by,updated_at,deleted_by,deleted_at,deleted FROM seguidores WHERE deleted=0;",
+       const [rows] = await connection.query("SELECT id_seguidor,id_seguido,id_usuario,created_at,created_by,updated_by,updated_at,deleted_by,deleted_at,deleted FROM seguidores WHERE deleted=0 AND id_seguidor = ?",
        [id]
        );
         connection.end();
         if(rows.length > 0){
         const row = rows[0];
         return new Seguidores({
+            id_seguidor: row.id_seguidor,
             id_seguido: row.id_seguido,
             id_usuario: row.id_usuario,
             fecha_seguido: row.fecha_seguido,
@@ -100,25 +101,25 @@ class Seguidores{
     }
 
 
-    static async deleteLogico(seguidor){
+    static async deleteLogico({deleted_by,id_usuario,id_seguido}){
         const connection = await db.createConnection();
         const  deleted_at = new Date();
-        console.log(seguidor)
-        const [result]= await connection.execute("UPDATE seguidores SET deleted=true,deleted_by=?,deleted_at=? WHERE id_seguido=? ",
-        [seguidor.deleted_by,deleted_at,seguidor.id_seguido]);
+        const [result]= await connection.execute("UPDATE seguidores SET deleted= 1 , deleted_by = ?, deleted_at = ? WHERE id_seguido=? AND id_usuario=? ",
+        [deleted_by,deleted_at,id_seguido,id_usuario]);
         connection.end();
         if (result.affectedRows == 0) {
             throw new Error("no se pudo eliminar la pintura");
           }
-          return;
+        return;
     }
 
-   static async update(id_seguido,{id_usuario,updated_by}){
+   static async update({updated_by,id_usuario,id_seguido}){
     const connection = await db.createConnection();
     const updated_at = new Date();
-    const [result]= await connection.execute("UPDATE seguidores SET id_usuario=?, updated_by=?,updated_at=? WHERE id_seguido=?",
-     [id_usuario,updated_by,updated_at,id_seguido]);
+    const [result]= await connection.execute("UPDATE seguidores SET updated_by = ?, updated_at = ?, deleted = 0 WHERE id_usuario = ? AND id_seguido = ?",
+     [updated_by,updated_at,id_usuario,id_seguido]);
      connection.end();
+
      if(result.affectedRows==0){
       throw new Error("No se pudo actualizar al seguidor")
      }

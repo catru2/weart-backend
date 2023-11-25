@@ -1,5 +1,5 @@
 const db= require("../configs/ConfiDB")
-
+const jwt = require ("jsonwebtoken");
 
 class Seguidores{
     constructor({id_seguidor,id_seguido,id_usuario,created_by,fecha_seguido,updated_by,updated_at,deleted_by,deleted_at,deleted }){
@@ -14,11 +14,28 @@ class Seguidores{
              this.deleted_at=deleted_at;
              this.deleted=deleted;
     }
-      static async getAll(){
+      static async getAll(id){
         const connection=  await db.createConnection();
-        const [rows] = await connection.query("SELECT id_seguido,id_usuario,fecha_seguido,created_by,updated_by,updated_at,deleted_by,deleted_at,deleted FROM seguidores WHERE deleted=0;"
-        );
+        const [rows] = await connection.query("SELECT id_seguidor,id_seguido,id_usuario,created_at,created_by,updated_by,updated_at,deleted_by,deleted_at,deleted FROM seguidores WHERE deleted=0 AND id_usuario = ?",[id]);
         connection.end();
+        
+        return rows;
+      }
+      
+      static async getSeguidores(id){
+        const connection=  await db.createConnection();
+        const [rows] = await connection.query("SELECT id_seguidor,id_seguido,id_usuario,created_at,created_by,updated_by,updated_at,deleted_by,deleted_at,deleted FROM seguidores WHERE deleted=0 AND id_seguido = ?",[id]);
+        connection.end();
+        
+        return rows;
+      }
+
+      static async getCountSeguidores(id){
+        const connection = await db.createConnection()
+        const [rows] = await connection.query("SELECT count(*) FROM seguidores WHERE deleted=0 AND id_seguido = ?",[id])
+
+        connection.end()
+
         return rows;
       }
 
@@ -49,8 +66,8 @@ class Seguidores{
         const connection = await db.createConnection();
 
         const [rows] = await connection.query("SELECT id_usuario, id_seguido FROM seguidores WHERE id_usuario = ? AND id_seguido = ?",[this.id_usuario,this.id_seguido]);
-        if(rows.length > 0){
-            throw new Error("El seguidor ya esta agregado")
+        if(rows.length > 0 || this.id_usuario == this.id_seguido){
+            throw new Error("El seguidor ya esta agregado, o no te puedes seguir a ti mismo")
         }
         const rows2 = await connection.query("SELECT id_usuario FROM usuarios WHERE id_usuario = ? AND deleted = 0",[this.id_seguido]);
         if(rows2[0].length == 0){
@@ -106,6 +123,11 @@ class Seguidores{
       throw new Error("No se pudo actualizar al seguidor")
      }
      return;
+   }
+
+   static obtenerIdToken(token){
+    const decoded = jwt.verify(token,process.env.SECRET_NAME)
+    return decoded;
    }
 
 

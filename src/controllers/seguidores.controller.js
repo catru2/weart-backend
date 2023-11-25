@@ -1,9 +1,11 @@
 const Seguidores = require("../models/seguidores.model");
 const jwt = require ("jsonwebtoken");
 
-const index = async(req,res)=>{
+const getAllSeguidos = async(req,res)=>{
     try{
-      const seguidores= await Seguidores.getAll();
+        const token=req.headers.token
+        const decoded = Seguidores.obtenerIdToken(token)
+      const seguidores= await Seguidores.getAll(decoded.id);
       return res.status(200).json({
         message:("se obtuvo a todos los seguidores correcatmanete "),
         data:seguidores
@@ -15,6 +17,39 @@ const index = async(req,res)=>{
        })
     }
 }
+const getAllSeguidores = async (req,res)=>{
+    try{
+        const token= req.headers.token
+        const decoded = Seguidores.obtenerIdToken(token)
+        const seguidores = await Seguidores.getSeguidores(decoded.id);
+        return res.status(200).json({
+            message:"seguidores obtenidos correctamente",
+            data:seguidores
+        })
+    }catch(error){
+        return res.status(500).json({
+            message:"no se pudo obtener a los seguidores",
+            error:error.message
+        })
+    }
+}
+const getCountSeguidores = async (req,res)=>{
+    try{
+        const token= req.headers.token
+        const decoded = Seguidores.obtenerIdToken(token)
+        const seguidores = await Seguidores.getCountSeguidores(decoded.id);
+        return res.status(200).json({
+            message:"seguidores obtenidos correctamente",
+            data:seguidores
+        })
+    }catch(error){
+        return res.status(500).json({
+            message:"no se pudo obtener a los seguidores",
+            error:error.message
+        })
+    }
+}
+
 const getById = async (req,res)=>{
     try{
         const {id} = req.params;
@@ -40,7 +75,7 @@ const getById = async (req,res)=>{
 const crearseguidor = async (req,res)=>{
     try{
      const token=req.headers.token
-     const decoded= jwt.verify(token,process.env.SECRET_NAME)
+     const decoded = await Seguidores.obtenerIdToken(token)
      console.log(decoded)
      const seguidores= new Seguidores({
         id_seguido: req.params.id,
@@ -119,9 +154,10 @@ const deleteLogico = async (req,res)=>{
 
 
 module.exports={
-    index,
+    getAllSeguidos,
+    getAllSeguidores,
     crearseguidor,
     getById,
     delete:deleteLogico,
-
+    getCountSeguidores
 }

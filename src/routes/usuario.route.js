@@ -11,6 +11,6 @@ router.get("/:id" ,verifyToken,usuarioController.getById)
 router.post("/",usuarioController.createUser)
 router.delete("/:id",verifyToken,usuarioController.delete)
 router.put("/:id",verifyToken,usuarioController.update)
-
+router.patch("/",verifyToken,usuarioController.updateDescription)
 
 module.exports=router

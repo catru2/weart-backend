@@ -110,6 +110,15 @@ static async updateById(id_usuario,{nombre,correo,contrasena}){
   }
   return
 }
+static async updateDescription({id_usuario,descripcion}){
+  const connection = await db.createConnection()
+  const updateAt = new Date()
+  const [result] = await connection.execute("UPDATE usuarios SET biografia = ?,updated_at = ? WHERE id_usuario = ?",[descripcion,updateAt,id_usuario])
+  if(result.affectedRows == 0){
+      throw new Error("no se pudo actualizar el usuario")
+  }
+  return
+}
 
 static async findUsername(correo) {
   const connection = await db.createConnection();

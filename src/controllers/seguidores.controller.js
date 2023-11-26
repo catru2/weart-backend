@@ -3,7 +3,7 @@ const jwt = require ("jsonwebtoken");
 
 const getAllSeguidos = async(req,res)=>{
     try{
-        const token=req.headers.token
+        const token=req.cookies.token
         const decoded = Seguidores.obtenerIdToken(token)
       const seguidores= await Seguidores.getAll(decoded.id);
       return res.status(200).json({
@@ -19,7 +19,7 @@ const getAllSeguidos = async(req,res)=>{
 }
 const getAllSeguidores = async (req,res)=>{
     try{
-        const token= req.headers.token
+        const token= req.cookies.token
         const decoded = Seguidores.obtenerIdToken(token)
         const seguidores = await Seguidores.getSeguidores(decoded.id);
         return res.status(200).json({
@@ -35,7 +35,7 @@ const getAllSeguidores = async (req,res)=>{
 }
 const getCountSeguidores = async (req,res)=>{
     try{
-        const token= req.headers.token
+        const token= req.cookies.token
         const decoded = Seguidores.obtenerIdToken(token)
         const seguidores = await Seguidores.getCountSeguidores(decoded.id);
         return res.status(200).json({
@@ -74,7 +74,7 @@ const getById = async (req,res)=>{
 
 const crearseguidor = async (req,res)=>{
     try{
-     const token=req.headers.token
+     const token=req.cookies.token
      const decoded = await Seguidores.obtenerIdToken(token)
      console.log(decoded)
      const seguidores= new Seguidores({
@@ -113,7 +113,7 @@ const deleteFisico = async (req,res) =>{
 
 const updateId = async (req,res)=>{
     try{
-     const token=req.headers.token
+     const token=req.cookies.token
      const decoded= Seguidores.obtenerIdToken(token)
      const seguidor = {
         updated_by:decoded.id,
@@ -134,7 +134,7 @@ const updateId = async (req,res)=>{
 
 const deleteLogico = async (req,res)=>{
     try{
-        const token=req.headers.token
+        const token=req.cookies.token
         const decoded = Seguidores.obtenerIdToken(token)
         const seguidor={
             deleted_by:decoded.id,

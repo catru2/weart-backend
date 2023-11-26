@@ -1,5 +1,5 @@
 const db= require("../configs/ConfiDB");
-const bcrypt = require("bcrypt");
+const jwt = require("jsonwebtoken");
 class Pintura{
     constructor({ id_pintura,id_usuario,titulo,descripcion, imagen,fecha_pintura,created_by, created_at ,updated_by,updated_at,deleted_by,deleted_at,deleted }) {
         this.id_pintura=id_pintura;
@@ -19,17 +19,20 @@ class Pintura{
       
       static async getAll({limit,offset},{sort,order}) {
         const connection = await db.createConnection();
-        const query = "SELECT id_pintura,id_usuario,titulo,descripcion,imagen,created_at,created_by, created_at ,updated_by,updated_at FROM pinturas WHERE deleted=0 "
-        if(sort && order){
-          query += `ORDER BY ${sort} ${order}`
+        let query = "SELECT id_pintura,id_usuario,titulo,descripcion,imagen,created_at,created_by, created_at ,updated_by,updated_at FROM pinturas WHERE deleted=0 "
+        if (sort && order) {
+          query += ` ORDER BY ${sort} ${order}`
         }
-        if(limit && offset){
-          query += `LIMIT ${limit} OFFSET ${offset}`
+
+        if (offset >= 0 && limit) {
+            query += ` LIMIT ${offset}, ${limit}`;
         }
         const [rows] = await connection.query(query);
         connection.end();
         return rows;
       }
+
+
       static async count(){
         const connection = await db.createConnection();
         const [rows] = await connection.query(
@@ -43,9 +46,9 @@ class Pintura{
       static async getById(id) {
         const connection = await db.createConnection();
         const [rows] = await connection.query(
-          "SELECT id_pintura,id_usuario,titulo,descripcion, url_imagen,fecha_pintura,likes,created_by, created_at ,updated_by,updated_at,deleted_by,deleted_at,deleted FROM pinturas WHERE id_pintura=? AND deleted=0 ;",
+          "SELECT id_pintura, id_usuario, titulo, descripcion, imagen, created_at, created_by, created_at ,updated_by, updated_at, deleted_by, deleted_at, deleted FROM pinturas WHERE id_pintura=? AND deleted=0 ;",
           [id]
-        );
+          );
         connection.end();
         if (rows.length > 0) {
           const row = rows[0];
@@ -54,9 +57,8 @@ class Pintura{
             id_usuario: row.id_usuario,
             titulo: row.titulo,
             descripcion: row.descripcion,
-            imagen: row.url_imagen,
+            imagen: row.imagen,
             fecha_pintura: row.fecha_pintura,
-            likes: row.likes,
             created_by: row.created_by,
             created_at: row.created_at,
             updated_by: row.updated_by,
@@ -70,16 +72,16 @@ class Pintura{
       }
 
       async save() {
-        const connection = await db.createConnection();
-        const [result] = await connection.execute(
-          "INSERT INTO pinturas(id_usuario,titulo,descripcion,imagen,created_by,created_at) VALUES (?,?,?,?,?,?)",
-          [this.id_usuario,this.titulo,this.descripcion, this.imagen,this.created_by,this.created_at]
-        );
-        connection.end();
-        if (result.insertId == 0) {
-          throw new Error("no se pudo crear la pintura");
-        }
-        this.id = result.insertId;
+          const connection = await db.createConnection();
+          const [result] = await connection.execute(
+            "INSERT INTO pinturas(id_usuario,titulo,descripcion,imagen,created_by,created_at) VALUES (?,?,?,?,?,?)",
+            [this.id_usuario,this.titulo,this.descripcion, this.imagen,this.created_by,this.created_at]
+          );
+          connection.end();
+          if (result.insertId == 0) {
+            throw new Error("no se pudo crear la pintura");
+          }
+          this.id_pintura = result.insertId;
       }
       
         static async deleteFisicoById(id) {
@@ -97,13 +99,13 @@ class Pintura{
           return;
         }
 
-        static async deleteById(pintura) {
+        static async deleteById({id_pintura,id_usuario}) {
             const connection = await db.createConnection();
           
             const  deleted_at = new Date();
             const [result] = await connection.execute(
               "UPDATE pinturas SET deleted=true ,deleted_by=? ,deleted_at=? WHERE id_pintura=?",
-              [ pintura.id_usuario,deleted_at,pintura.id_pintura]
+              [ id_usuario,deleted_at, id_pintura]
             );
         
             connection.end();
@@ -126,6 +128,11 @@ class Pintura{
              
             return
           }
+
+          static obtenerIdToken(token){
+            const decoded = jwt.verify(token,process.env.SECRET_NAME)
+            return decoded;
+           }
       
 }
 module.exports = Pintura;

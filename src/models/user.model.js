@@ -35,6 +35,7 @@ static async getById(id) {
     const row = rows[0];
     return new User({
       id_usuario: row.id_usuario,
+      nombre: row.nombre,
       correo: row.correo,
       contrasena: row.contrasena,
       fecha_nacimiento: row.fecha_nacimiento,

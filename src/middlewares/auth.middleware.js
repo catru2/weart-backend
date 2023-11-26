@@ -1,8 +1,8 @@
 const jwt = require("jsonwebtoken")
 const User = require("../models/user.model")
-const verifyToken = (req, res, next) => {
+const verifyToken = async(req, res, next) => {
     try{
-        const token = req.headers.token
+        const token = req.cookies.token
         
         if(!token){
             return res.status(403).json({
@@ -12,8 +12,8 @@ const verifyToken = (req, res, next) => {
         
         const decoded = jwt.verify(token,process.env.SECRET_NAME)
 
-        const correo = User.getById(decoded.id)
-
+        const correo = await User.getById(decoded.id)
+        console.log("Hola "+correo.nombre)
         
         if(!correo){
             return res.status(404).json({

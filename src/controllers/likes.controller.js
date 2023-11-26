@@ -3,11 +3,27 @@ const jwt = require("jsonwebtoken")
 
 const index = async (req, res) => {
     try {
-        const lik = await Likes.getAll();
-        return res.status(200).json({
+        const limit = parseInt(req.query.limit);
+        const page = parseInt(req.query.page);
+        const {sort,order} = req.query;
+        const offset = (page - 1) * limit;
+
+        const likes = await Likes.getAll(req.params.id,{limit,offset},{sort,order});
+
+        let response ={
             message: "Likes obtenidos correctamente",
-            data: lik
-        })
+            data: likes
+        }
+        if(page && limit){
+            const totalLikes = await Likes.count(req.params.id);
+            response = {
+                ...response,
+                total:  totalLikes,
+                totalPages: Math.ceil(totalLikes / limit),
+                currentPage: page,
+            }
+        }
+        return res.status(200).json(response)
     } catch(error){
         return res.status(500).json({
             message: "Error al obtener likes",
@@ -18,12 +34,11 @@ const index = async (req, res) => {
 
 const createLike = async (req, res) =>{
     try{
-        console.log(req.body)
-        const decoded = {
-            id:1
-        };
+        const token = req.cookies.token
+        const decoded = await Likes.getTokenid(token)
         const like = new Likes ({
             id_pintura: req.params.id,
+            id_usuario: decoded.id,
             created_by: decoded.id,
             created_at : new Date()
         })
@@ -59,32 +74,16 @@ const getById = async (req, res) =>{
         })
     }
 }
-const deletseLogico = async (req,res) =>{
-    try{
-        const token=req.headers.token
-        const decoded = jwt.verify(token, process.env.SECRET_NAME)
-        const pintura = {
-            id_usuario: decoded.id,
-            id_pintura: req.params.id
-        }
-        await Pintura.deleteById(pintura);
-        return res.status(200).json({
-            message:"pintura eliminada correctamente",
-        })
-    }catch(error){
-        return res.status(500).json({
-            message:"error al eliminar la pintura",
-            error:error.message
-        })
-    }
-}
+
+
 const deleteLogico = async (req, res) => {
     try {
-        const token = req.headers.token
-        const decoded = jwt.verify(token, process.env.SECRET_NAME)
+        const token = req.cookies.token
+        const decoded = await Likes.getTokenid(token)
         const like = {
-            id_pintura: decoded.id,
-            id_likes: req.params.id
+            id_pintura: req.params.id,
+            id_usuario: decoded.id,
+            deleted_by: decoded.id,
         }
         await Likes.deleteById(like);
         return res.status(200).json({
@@ -97,6 +96,8 @@ const deleteLogico = async (req, res) => {
         })
     }
 }
+
+
 const deleteFisico = async (req, res) => {
     try {
         const id_likes = req.params.id;
@@ -113,13 +114,11 @@ const deleteFisico = async (req, res) => {
 }
 const update = async (req,res) =>{
     try {
-        // const token = req.headers.token
-        // const decoded = jwt.verify(token, process.env.SECRET_NAME
-        const decoded = {
-            id:1
-        };
+        const token = req.cookies.token
+        const decoded = await Likes.getTokenid(token)
         const like = {
             id_pintura: req.params.id,
+            id_usuario: decoded.id,
             updated_by: decoded.id
         }
         await Likes.updateById(like); 

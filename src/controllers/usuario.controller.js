@@ -1,9 +1,8 @@
 require("dotenv").config();
 const User = require("../models/user.model");
 const bcrypt = require("bcrypt");
-const { request } = require("express");
 const saltos = process.env.SALTOS;
-
+const jwt = require("jsonwebtoken");
 //1
 const index = async (req, res) => {
     try{
@@ -23,7 +22,6 @@ const index = async (req, res) => {
 //2
 const createUser = async (req,res) =>{
     try{
-        console.log(req.body)
         const usuario = new User({
             nombre: req.body.nombre,
             correo:req.body.correo,
@@ -113,6 +111,26 @@ const deleteFisico = async (req,res)=>{
     }
 }
 
+const updateDescription = async (req,res) =>{
+    try{
+        const token = req.cookies.token
+        const decoded = jwt.verify(token,process.env.SECRET_NAME)
+        const usuario = {
+            id_usuario: decoded.id,
+            descripcion:req.body.descripcion
+        }
+        await User.updateDescription(usuario)
+        return res.status(200).json({
+            message:"se actualizo correctamente"
+        })
+    }catch(error){
+        return res.status(500).json({
+            message:"error al actualizar la descripcion",
+            error: error.message
+        })
+    }
+}
+
 
 module.exports={
    index,
@@ -120,5 +138,5 @@ module.exports={
    getById,
    delete: deleteLogico,
    update,
-
+    updateDescription
 }

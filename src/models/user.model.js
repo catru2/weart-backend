@@ -18,7 +18,7 @@ class User{
 static async getAll() {
   const connection = await db.createConnection();
   const [rows] = await connection.query(
-    "SELECT id_usuario,nombre,correo,contrasena,fecha_nacimiento,fecha_creacion,fecha_actualizacion,eliminado,fecha_eliminado FROM usuarios WHERE eliminado=0 ;"
+    "SELECT id_usuario,nombre,correo,contrasena,fecha_nacimiento,created_at,updated_at FROM usuarios WHERE deleted=0 ;"
   );
   connection.end();
   return rows;
@@ -27,7 +27,7 @@ static async getAll() {
 static async getById(id) {
   const connection = await db.createConnection();
   const [rows] = await connection.query(
-    "SELECT id_usuario,nombre,correo,contrasena,fecha_nacimiento,fecha_creacion,fecha_actualizacion,eliminado,fecha_eliminado FROM usuarios WHERE id_usuario=? AND eliminado=0 ;",
+    "SELECT id_usuario,nombre,correo,contrasena,fecha_nacimiento,created_at,updated_at,deleted,deleted_at FROM usuarios WHERE id_usuario=?;",
     [id]
   );
   connection.end();
@@ -35,13 +35,14 @@ static async getById(id) {
     const row = rows[0];
     return new User({
       id_usuario: row.id_usuario,
+      nombre: row.nombre,
       correo: row.correo,
       contrasena: row.contrasena,
       fecha_nacimiento: row.fecha_nacimiento,
-      fecha_creacion: row.fecha_creacion,
-      fecha_actualizacion: row.fecha_actualizacion,
-      eliminado: row.eliminado,
-      fecha_eliminado: row.fecha_eliminado,
+      fecha_creacion: row.created_at,
+      fecha_actualizacion: row.updated_at,
+      eliminado: row.deleted,
+      fecha_eliminado: row.deleted_at,
     });
   }
   return null;
@@ -52,14 +53,14 @@ static async getById(id) {
 async save() {
   const connection = await db.createConnection();
   const [result] = await connection.execute(
-    "INSERT INTO usuarios(nombre,correo,contrasena,fecha_nacimiento,fecha_creacion) VALUES (?,?,?,?,?)",
+    "INSERT INTO usuarios(nombre,correo,contrasena,fecha_nacimiento,created_at) VALUES (?,?,?,?,?)",
     [this.nombre,this.correo, this.contrasena,this.fecha_nacimiento,this.fecha_creacion]
   );
   connection.end();
   if (result.insertId == 0) {
     throw new Error("no se pudo crear el usuario");
   }
-  this.id = result.insertId;
+  this.id_usuario = result.insertId;
 }
 
   static async deleteFisicoById(id) {
@@ -83,7 +84,7 @@ async save() {
 
     const fecha_eliminado = new Date();
     const [result] = await connection.execute(
-      "UPDATE usuarios SET eliminado=true ,fecha_eliminado=? WHERE id_usuario=?",
+      "UPDATE usuarios SET deleted = true ,deleted_at = ? WHERE id_usuario=?",
       [fecha_eliminado, id_usuario]
     );
 
@@ -102,12 +103,20 @@ static async updateById(id_usuario,{nombre,correo,contrasena}){
   if(contrasena){
     password=bcrypt.hashSync(contrasena,saltos)
   }
-  const [result] = await connection.execute("UPDATE usuarios SET nombre=?,correo=?,contrasena=?,fecha_actualizacion=? WHERE id_usuario=?",[nombre,correo,password,updateAt,id_usuario]);
+  const [result] = await connection.execute("UPDATE usuarios SET nombre=?,correo=?,contrasena=?,updated_at=? WHERE id_usuario=?",[nombre,correo,password,updateAt,id_usuario]);
 
   if(result.affectedRows == 0){
       throw new Error("no se pudo actualizar el usuario");
   }
-   
+  return
+}
+static async updateDescription({id_usuario,descripcion}){
+  const connection = await db.createConnection()
+  const updateAt = new Date()
+  const [result] = await connection.execute("UPDATE usuarios SET biografia = ?,updated_at = ? WHERE id_usuario = ?",[descripcion,updateAt,id_usuario])
+  if(result.affectedRows == 0){
+      throw new Error("no se pudo actualizar el usuario")
+  }
   return
 }
 
@@ -131,6 +140,7 @@ static async encryptPassword(password){
   const salt = await bcrypt.genSalt(saltos)
   return await bcrypt.hash(password,salt)
 }
+
 static async comparePassword(password,receivedPassword){
   return await bcrypt.compare(password,receivedPassword)
 } 

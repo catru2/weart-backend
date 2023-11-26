@@ -1,6 +1,5 @@
 const Pintura = require("../models/pintura.model") 
 const jwt = require ("jsonwebtoken")
-const bcrypt = require("bcrypt");
 const fs=require("fs-extra")
 const { uploadImage } = require("../configs/cloudinary.config")
 
@@ -8,11 +7,28 @@ const { uploadImage } = require("../configs/cloudinary.config")
 
 const index = async (req, res) => {
     try{
-        const usuarios = await Pintura.getAll();
-        return res.status(200).json({
+        const limit= parseInt(req.query.limit)
+        const page = parseInt(req.query.page)
+        const offset = (page - 1) * limit
+        const {sort,order} = req.query
+
+        const usuarios = await Pintura.getAll({limit,offset},{sort,order});
+
+        let response = {
             message: "pinturas obtenidas correctamente",
             data: usuarios
-        })
+        }
+        if(page && limit){
+            const totalPinturas = await Pintura.count()
+            response = {
+                ...response,
+                total:  totalPinturas,
+                totalPages: Math.ceil(totalPinturas / limit),
+                currentPage: page,
+            }
+        }
+        
+        return res.status(200).json(response)
     }catch(error){
         return res.status(500).json({
         message: "error al obtener datos",
@@ -23,9 +39,8 @@ const index = async (req, res) => {
 
 const createPintura = async (req,res) =>{
     try{
-        console.log(req.body)
-        const token=req.headers.token
-        const decoded= jwt.verify(token,process.env.SECRET_NAME)
+        const token=req.cookies.token
+        const decoded = Pintura.obtenerIdToken(token)
         
         let imagen=null
         if(req.files?.imagen){
@@ -52,10 +67,11 @@ const createPintura = async (req,res) =>{
         })
     }
 }
+
 const getById = async(req,res)=>{
     try{
   const {id} = req.params;
-  const pinturas=await Pintura.getById(id);
+  const pinturas = await Pintura.getById(id);
   if(!pinturas){
     return res.status(404).json({
         massage:"no se pudo encontrar al id" + id,
@@ -75,8 +91,8 @@ const getById = async(req,res)=>{
 
 const deleteLogico = async (req,res) =>{
     try{
-        const token=req.headers.token
-        const decoded = jwt.verify(token, process.env.SECRET_NAME)
+        const token=req.cookies.token
+        const decoded = Pintura.obtenerIdToken(token)
         const pintura = {
             id_usuario: decoded.id,
             id_pintura: req.params.id
@@ -92,6 +108,7 @@ const deleteLogico = async (req,res) =>{
         })
     }
 }
+
 const deleteFisico = async (req,res)=>{
     try{
         const id_pintura = req.params.id;
@@ -108,9 +125,8 @@ const deleteFisico = async (req,res)=>{
 }
 const update = async (req,res)=>{
     try{ 
-        const token=req.headers.token
-        const decoded = jwt.verify(token, process.env.SECRET_NAME)
-        console.log(req.body)
+        const token=req.cookies.token
+        const decoded = Pintura.obtenerIdToken(token)
         let imagen=null
 
         if(req.files?.imagen){
@@ -140,7 +156,6 @@ module.exports={
     index,
     createPintura,
     getById,
-    delete: deleteFisico,
+    delete: deleteLogico,
     update
- 
  }

@@ -4,10 +4,10 @@ const express=require("express");
 
 const router=express.Router()
 
-router.get("/pinturas" ,pinturaController.index)
-router.get("/pinturas/:id" ,verifyToken,pinturaController.getById)
-router.post("/pinturas",verifyToken,pinturaController.createPintura)
-router.delete("/pinturas/:id",verifyToken,pinturaController.delete)
-router.put("/pinturas/:id",verifyToken,pinturaController.update)
+router.get("/" ,pinturaController.index)
+router.get("/:id" ,verifyToken,pinturaController.getById)
+router.post("/",verifyToken,pinturaController.createPintura)
+router.delete("/:id",verifyToken,pinturaController.delete)
+router.put("/:id",verifyToken,pinturaController.update)
 
 module.exports=router

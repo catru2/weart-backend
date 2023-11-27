@@ -6,11 +6,11 @@ const router=express.Router()
 
 
 
-router.get("/" ,verifyToken,usuarioController.index)
-router.get("/:id" ,verifyToken,usuarioController.getById)
+router.get("/" ,usuarioController.index)
+router.get("/:id" ,usuarioController.getById)
 router.post("/",usuarioController.createUser)
 router.delete("/:id",verifyToken,usuarioController.delete)
 router.put("/:id",verifyToken,usuarioController.update)
 router.patch("/",verifyToken,usuarioController.updateDescription)
-
+router.get("/get/by/token",usuarioController.getBytoken)
 module.exports=router

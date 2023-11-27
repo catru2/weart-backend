@@ -31,7 +31,15 @@ class Pintura{
         connection.end();
         return rows;
       }
-
+      static async getAllByIdUsuario(id) {
+        const connection = await db.createConnection();
+        const [rows] = await connection.query(
+          "SELECT id_pintura,id_usuario,titulo,descripcion,imagen,created_at,created_by, created_at ,updated_by,updated_at FROM pinturas WHERE id_usuario=? AND deleted=0 ;",
+          [id]
+        );
+        connection.end();
+        return rows;
+      }
 
       static async count(){
         const connection = await db.createConnection();

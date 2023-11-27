@@ -3,8 +3,6 @@ const jwt = require ("jsonwebtoken")
 const fs=require("fs-extra")
 const { uploadImage } = require("../configs/cloudinary.config")
 
-
-
 const index = async (req, res) => {
     try{
         const limit= parseInt(req.query.limit)
@@ -33,6 +31,21 @@ const index = async (req, res) => {
         return res.status(500).json({
         message: "error al obtener datos",
         error:error.message
+        })
+    }
+}
+const getAllByIdUsuario = async (req,res)=>{
+    try{
+        const {id} = req.params;
+        const pinturas = await Pintura.getAllByIdUsuario(id);
+        return res.status(200).json({
+            message:"pinturas obtenidas correctamente",
+            data:pinturas
+        })
+    }catch(error){
+        return res.status(500).json({
+            message:"error al obtener mis pinturas",
+            error:error.message
         })
     }
 }
@@ -157,5 +170,6 @@ module.exports={
     createPintura,
     getById,
     delete: deleteLogico,
-    update
+    update,
+    getAllByIdUsuario,
  }

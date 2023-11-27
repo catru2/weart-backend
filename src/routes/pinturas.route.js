@@ -5,9 +5,9 @@ const express=require("express");
 const router=express.Router()
 
 router.get("/" ,pinturaController.index)
-router.get("/:id" ,verifyToken,pinturaController.getById)
+router.get("/:id" ,pinturaController.getById)
 router.post("/",verifyToken,pinturaController.createPintura)
 router.delete("/:id",verifyToken,pinturaController.delete)
 router.put("/:id",verifyToken,pinturaController.update)
-
+router.get("/usuario/:id",pinturaController.getAllByIdUsuario)
 module.exports=router

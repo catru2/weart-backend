@@ -113,8 +113,10 @@ const deleteFisico = async (req,res)=>{
 
 const updateDescription = async (req,res) =>{
     try{
+        console.log("esto trae el body : "+req.body.descripcion)
         const token = req.cookies.token
         const decoded = jwt.verify(token,process.env.SECRET_NAME)
+        
         const usuario = {
             id_usuario: decoded.id,
             descripcion:req.body.descripcion
@@ -131,12 +133,29 @@ const updateDescription = async (req,res) =>{
     }
 }
 
-
+const getBytoken = (req,res) =>{
+    try{
+        console.log("sisisissi")
+        const token = req.cookies.token
+        const decoded = jwt.verify(token,process.env.SECRET_NAME)
+        console.log(decoded)
+        return res.status(200).json({
+            message:"se obtuvo correctamente",
+            data:decoded.id
+        })
+    }catch(error){
+        return res.status(500).json({
+            message:"error al obtener un usuario",
+            error:error.message
+        })
+    }
+}
 module.exports={
    index,
    createUser,
    getById,
    delete: deleteLogico,
    update,
-    updateDescription
+    updateDescription,
+    getBytoken
 }

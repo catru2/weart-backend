@@ -31,6 +31,20 @@ const index = async (req, res) => {
         })
     }
 }
+const contadorLikes = async (req, res) => {
+    try {
+        const totalLikes = await Likes.count(req.params.id);
+        return res.status(200).json({
+            message: "Likes obtenidos correctamente",
+            data: totalLikes
+        })
+    } catch(error){
+        return res.status(500).json({
+            message: "Error al obtener likes",
+            error: error.message
+        })
+    }
+}
 
 const createLike = async (req, res) =>{
     try{
@@ -138,5 +152,6 @@ module.exports={
     createLike,
     getById,
     delete: deleteLogico,
-    update
+    update,
+    contadorLikes
 }

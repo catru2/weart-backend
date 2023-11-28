@@ -1,20 +1,17 @@
+require("dotenv").config()
 const jwt = require("jsonwebtoken")
 const User = require("../models/user.model")
 const verifyToken = async(req, res, next) => {
     try{
         const token = req.cookies.token
-        
         if(!token){
             return res.status(403).json({
                 message:"token no encontrado"
             })
         }
-        
         const decoded = jwt.verify(token,process.env.SECRET_NAME)
-
         const correo = await User.getById(decoded.id)
         console.log("Hola "+correo.nombre)
-        
         if(!correo){
             return res.status(404).json({
                 message:"usuario no encontrado"

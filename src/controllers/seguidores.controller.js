@@ -70,13 +70,28 @@ const getById = async (req,res)=>{
            })
     }
 }
+const getBooleanSeguidor = async (req,res) => {
+    try{
+        const token= req.cookies.token
+        const decoded = Seguidores.obtenerIdToken(token)
+        const seguidores = await Seguidores.getBooleanSeguidor(decoded.id,req.params.id);
+        return res.status(200).json({
+            message:"seguidor obtenido correctamente",
+            data:seguidores
+        })
+    }catch(error){
+        return res.status(500).json({
+            message:("No se pudo obtener al seguidor"),
+            error:error.message
+           })
+    }
+}
 
 
 const crearseguidor = async (req,res)=>{
     try{
-     const token=req.cookies.token
-     const decoded = await Seguidores.obtenerIdToken(token)
-     console.log(decoded)
+    const token= req.cookies.token
+     const decoded = Seguidores.obtenerIdToken(token)
      const seguidores= new Seguidores({
         id_seguido: req.params.id,
         id_usuario:decoded.id,
@@ -163,5 +178,6 @@ module.exports={
     getById,
     delete:deleteLogico,
     getCountSeguidores,
-    updateId
+    updateId,
+    getBooleanSeguidor
 }

@@ -27,7 +27,7 @@ static async getAll() {
 static async getById(id) {
   const connection = await db.createConnection();
   const [rows] = await connection.query(
-    "SELECT id_usuario,nombre,correo,contrasena,fecha_nacimiento,created_at,updated_at,deleted,deleted_at FROM usuarios WHERE id_usuario=?;",
+    "SELECT id_usuario,nombre,correo,contrasena,fecha_nacimiento,biografia,created_at,updated_at,deleted,deleted_at FROM usuarios WHERE id_usuario=?;",
     [id]
   );
   connection.end();
@@ -37,6 +37,7 @@ static async getById(id) {
       id_usuario: row.id_usuario,
       nombre: row.nombre,
       correo: row.correo,
+      biografia: row.biografia,
       contrasena: row.contrasena,
       fecha_nacimiento: row.fecha_nacimiento,
       fecha_creacion: row.created_at,

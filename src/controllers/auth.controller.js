@@ -4,7 +4,6 @@ const cookie = require("cookie")
 
 const signIn = async(req,res)=>{
     const usuarioFound = await User.findUsername(req.body.correo)
-    console.log(usuarioFound)
     if(!usuarioFound){
         return res.status(404).json({
             message:"usuario o password incorrectos"

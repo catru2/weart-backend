@@ -111,7 +111,7 @@ class Likes{
     static async count(id){
         const connection = await db.createConnection();
         const [rows] = await connection.execute(
-            "SELECT COUNT(*) FROM likes WHERE id_pintura = ?",
+            "SELECT COUNT(*) FROM likes WHERE id_pintura = ? AND deleted = 0",
             [id]
         );
         connection.end();
@@ -121,6 +121,13 @@ class Likes{
     static async getTokenid(token){
         const decoded = jwt.verify(token, process.env.SECRET_NAME)
         return decoded
+    }
+    static async getLikes(like){
+        const connection = await db.createConnection()
+        const [rows] = await connection.execute("SELECT id_likes, id_pintura, created_by, created_at, updated_by, updated_at, deleted_by, deleted_at, deleted FROM likes WHERE id_pintura = ? AND id_usuario = ?", [like.id_pintura, like.id_usuario]);
+        connection.end()
+
+        return rows
     }
 }
 module.exports = Likes;

@@ -31,6 +31,20 @@ const index = async (req, res) => {
         })
     }
 }
+const contadorLikes = async (req, res) => {
+    try {
+        const totalLikes = await Likes.count(req.params.id);
+        return res.status(200).json({
+            message: "Likes obtenidos correctamente",
+            data: totalLikes
+        })
+    } catch(error){
+        return res.status(500).json({
+            message: "Error al obtener likes",
+            error: error.message
+        })
+    }
+}
 
 const createLike = async (req, res) =>{
     try{
@@ -132,11 +146,35 @@ const update = async (req,res) =>{
         })
     }
 }
+const getLikes = async (req,res) => {
+    try{
+        const token = req.cookies.token
+        const decoded = await Likes.getTokenid(token)
+        const like ={
+            id_pintura: req.params.id,
+            id_usuario: decoded.id
+        }
+        const likes = await Likes.getLikes(like);
+        return res.status(200).json({
+            message: "Likes obtenidos correctamente",
+            data: likes
+        })
+    }catch(error){
+        return res.status(500).json({
+            message: "Error al obtener likes",
+            error: error.message
+        })
+    }
+}
+
+
 
 module.exports={
     index,
     createLike,
     getById,
     delete: deleteLogico,
-    update
+    update,
+    contadorLikes,
+    getLikes
 }

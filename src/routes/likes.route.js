@@ -10,4 +10,5 @@ router.post("/:id",verifyToken, likeController.createLike)
 router.delete("/:id",verifyToken, likeController.delete)
 router.put("/:id",verifyToken, likeController.update)
 router.get("/numero/:id", likeController.contadorLikes)
+router.get("/getLikes/:id", likeController.getLikes)
 module.exports=router

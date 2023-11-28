@@ -53,6 +53,7 @@ const getAllByIdUsuario = async (req,res)=>{
 const createPintura = async (req,res) =>{
     try{
         const token=req.cookies.token
+        console.log(token)
         const decoded = Pintura.obtenerIdToken(token)
         
         let imagen=null

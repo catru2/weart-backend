@@ -125,6 +125,12 @@ class Seguidores{
      }
      return;
    }
+   static async getBooleanSeguidor(idToken,idUsuario){
+    const connection = await db.createConnection();
+    const [rows] = await connection.query("SELECT id_seguidor,id_usuario,id_seguido,created_by,created_at,deleted,deleted_by,deleted_at FROM seguidores WHERE id_usuario = ? AND id_seguido = ?",[idToken,idUsuario]);
+    connection.end();
+    return rows;
+   }
 
    static obtenerIdToken(token){
     const decoded = jwt.verify(token,process.env.SECRET_NAME)

@@ -146,6 +146,28 @@ const update = async (req,res) =>{
         })
     }
 }
+const getLikes = async (req,res) => {
+    try{
+        const token = req.cookies.token
+        const decoded = await Likes.getTokenid(token)
+        const like ={
+            id_pintura: req.params.id,
+            id_usuario: decoded.id
+        }
+        const likes = await Likes.getLikes(like);
+        return res.status(200).json({
+            message: "Likes obtenidos correctamente",
+            data: likes
+        })
+    }catch(error){
+        return res.status(500).json({
+            message: "Error al obtener likes",
+            error: error.message
+        })
+    }
+}
+
+
 
 module.exports={
     index,
@@ -153,5 +175,6 @@ module.exports={
     getById,
     delete: deleteLogico,
     update,
-    contadorLikes
+    contadorLikes,
+    getLikes
 }

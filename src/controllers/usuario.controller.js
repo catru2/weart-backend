@@ -135,10 +135,8 @@ const updateDescription = async (req,res) =>{
 
 const getBytoken = (req,res) =>{
     try{
-        console.log("sisisissi")
         const token = req.cookies.token
         const decoded = jwt.verify(token,process.env.SECRET_NAME)
-        console.log(decoded)
         return res.status(200).json({
             message:"se obtuvo correctamente",
             data:decoded.id

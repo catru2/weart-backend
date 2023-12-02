@@ -128,6 +128,7 @@ const deleteFisico = async (req, res) => {
 }
 const update = async (req,res) =>{
     try {
+        console.log("gola")
         const token = req.cookies.token
         const decoded = await Likes.getTokenid(token)
         const like = {

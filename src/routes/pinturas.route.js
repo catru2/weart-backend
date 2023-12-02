@@ -10,4 +10,5 @@ router.post("/",verifyToken,pinturaController.createPintura)
 router.delete("/:id",verifyToken,pinturaController.delete)
 router.put("/:id",verifyToken,pinturaController.update)
 router.get("/usuario/:id",pinturaController.getAllByIdUsuario)
+router.get("/random/get",pinturaController.getRandomPintura)
 module.exports=router

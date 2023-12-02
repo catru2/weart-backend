@@ -49,6 +49,52 @@ const getAllByIdUsuario = async (req,res)=>{
         })
     }
 }
+const getRandomPintura = async (req,res) => {
+    try{
+        const limit= parseInt(req.query.limit)
+        const page = parseInt(req.query.page)
+        const offset = (page - 1) * limit
+        const {sort,order} = req.query
+
+        const numeroPinturas = await Pintura.count()
+        const pinturas = await Pintura.getAll({limit,offset},{sort,order});
+        const newPinturas = []
+        let num = []
+        let i = 0
+        num[i] = Math.floor(Math.random() * numeroPinturas)
+        for (let i = 0; i < numeroPinturas; i++) {
+            num[i] = Math.floor(Math.random() * numeroPinturas);
+            for (let k = 0; k < i; k++) {
+                if(num[i] == num[k]){
+                    i--
+                }
+            }
+        } 
+        for (let l = 0; l < num.length; l++) {
+            newPinturas[l] = pinturas[num[l]]
+        }
+
+
+        let response = {
+            message: "pinturas randoms correctamente",
+            data: newPinturas
+        }
+        if(page && limit){
+            response = {
+                ...response,
+                total:  numeroPinturas,
+                totalPages: Math.ceil(numeroPinturas / limit),
+                currentPage: page,
+            }
+        }
+        
+        return res.status(200).json(response)
+    }catch(error){
+        return res.status(500).json({
+            message:"no se pudo generar pinturas randoms"
+        })
+    }
+}
 
 const createPintura = async (req,res) =>{
     try{
@@ -141,17 +187,9 @@ const update = async (req,res)=>{
     try{ 
         const token=req.cookies.token
         const decoded = Pintura.obtenerIdToken(token)
-        let imagen=null
-
-        if(req.files?.imagen){
-            imagen=await uploadImage(req.files.imagen.tempFilePath)
-            await fs.unlink(req.files.imagen.tempFilePath)
-        } 
         const pintura = {
             id_usuario: decoded.id,
             titulo:req.body.titulo,
-            descripcion:req.body.descripcion,
-            imagen:imagen.secure_url  
         }
         await Pintura.updateById(req.params.id,pintura);
         return res.status(200).json({
@@ -173,4 +211,5 @@ module.exports={
     delete: deleteLogico,
     update,
     getAllByIdUsuario,
+    getRandomPintura,
  }

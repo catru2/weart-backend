@@ -124,11 +124,11 @@ class Pintura{
             return;
           }
 
-          static async updateById(id_pintura,{titulo,descripcion,imagen,id_usuario}){
+          static async updateById(id_pintura,{titulo,id_usuario}){
             const connection = await db.createConnection();
             const updateAt = new Date();
             
-            const [result] = await connection.execute("UPDATE pinturas SET titulo=?,descripcion=?,imagen=?,updated_by =?,updated_at =? WHERE id_pintura=?",[titulo,descripcion,imagen,id_usuario,updateAt,id_pintura]);
+            const [result] = await connection.execute("UPDATE pinturas SET titulo=?,updated_by =?,updated_at =? WHERE id_pintura=?",[titulo,id_usuario,updateAt,id_pintura]);
           
             if(result.affectedRows == 0){
                 throw new Error("no se pudo actualizar la pintura");

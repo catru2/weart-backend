@@ -187,17 +187,9 @@ const update = async (req,res)=>{
     try{ 
         const token=req.cookies.token
         const decoded = Pintura.obtenerIdToken(token)
-        let imagen=null
-
-        if(req.files?.imagen){
-            imagen=await uploadImage(req.files.imagen.tempFilePath)
-            await fs.unlink(req.files.imagen.tempFilePath)
-        } 
         const pintura = {
             id_usuario: decoded.id,
             titulo:req.body.titulo,
-            descripcion:req.body.descripcion,
-            imagen:imagen.secure_url  
         }
         await Pintura.updateById(req.params.id,pintura);
         return res.status(200).json({

@@ -1,6 +1,6 @@
 const Likes = require("../models/likes.model")
 const jwt = require("jsonwebtoken")
-
+const pusher = require("../configs/Pusher.config")
 const index = async (req, res) => {
     try {
         const limit = parseInt(req.query.limit);
@@ -50,6 +50,12 @@ const createLike = async (req, res) =>{
     try{
         const token = req.cookies.token
         const decoded = await Likes.getTokenid(token)
+        await pusher.trigger("chat", "message", {
+            id_pintura: req.params.id,
+            id_usuario: decoded.id,
+            created_by: decoded.id,
+            created_at : new Date()
+        })
         const like = new Likes ({
             id_pintura: req.params.id,
             id_usuario: decoded.id,

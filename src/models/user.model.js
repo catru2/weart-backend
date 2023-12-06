@@ -144,7 +144,17 @@ static async encryptPassword(password){
 
 static async comparePassword(password,receivedPassword){
   return await bcrypt.compare(password,receivedPassword)
-} 
+}
+
+
+static async deleteDataTable () {
+  const connection = await db.createConnection();
+  const [result] = await connection.execute(
+    "DELETE FROM usuarios"
+  );
+  connection.end();
+  return;
+}
 
 }
 module.exports = User;

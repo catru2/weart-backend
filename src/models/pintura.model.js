@@ -141,6 +141,11 @@ class Pintura{
             const decoded = jwt.verify(token,process.env.SECRET_NAME)
             return decoded;
            }
+           static async deleteDataTable (){
+            const connection = await db.createConnection();
+            await connection.query("DELETE FROM pinturas");
+            connection.end();
+           }
       
 }
 module.exports = Pintura;

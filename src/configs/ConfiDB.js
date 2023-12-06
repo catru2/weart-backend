@@ -11,4 +11,4 @@ const createConnection = async () => {
     return await mysql.createConnection(config);
 }
 
-module.exports = {createConnection};
+module.exports = {createConnection,config};

@@ -1,4 +1,6 @@
-const Likes = require("../models/likes.model")
+const Likes = require("../models/likes.model");
+const Pinturas = require("../models/pintura.model");
+const Seguidores = require("../models/seguidores.model");
 const jwt = require("jsonwebtoken")
 const pusher = require("../configs/Pusher.config")
 const index = async (req, res) => {
@@ -46,7 +48,7 @@ const contadorLikes = async (req, res) => {
     }
 }
 
-const createLike = async (req, res) =>{
+const createLikeWhithoutFolllow = async (req, res) =>{
     try{
         const token = req.cookies.token
         const decoded = await Likes.getTokenid(token)
@@ -74,6 +76,55 @@ const createLike = async (req, res) =>{
         })
     }
 }
+
+const createLikeWithTransaction = async (req, res) =>{
+    try{
+        const token = req.cookies.token
+        const decoded = await Likes.getTokenid(token);
+
+        await connection.beginTransaction();
+
+        await pusher.trigger("chat", "message", {
+            id_pintura: req.params.id,
+            id_usuario: decoded.id,
+            created_by: decoded.id,
+            created_at : new Date()
+        })
+        const like = new Likes ({
+            id_pintura: req.params.id,
+            id_usuario: decoded.id,
+            created_by: decoded.id,
+            created_at : new Date()
+        })
+        await like.save();
+
+        const idSeguido = await Pinturas.getUserByPintura(req.params.id);
+
+        const seguidores= new Seguidores({
+            id_seguido: idSeguido,
+            id_usuario:decoded.id,
+            created_by:decoded.id,
+            fecha_seguido: new Date()
+        })
+        
+        await seguidores.save();
+
+        await connection.commit();
+
+        return res.status(200).json({
+            message: "Like dado correctamente",
+            data: like
+        })
+    } catch(error){
+        await connection.rollback();
+        return res.status(500).json({
+            message: "Error al dar like",
+            error: error.message
+        })
+    }
+}
+
+
 const getById = async (req, res) =>{
     try {
         const {id} = req.params;
@@ -177,7 +228,7 @@ const getLikes = async (req,res) => {
 
 module.exports={
     index,
-    createLike,
+    createLike: createLikeWithTransaction,
     getById,
     delete: deleteLogico,
     update,

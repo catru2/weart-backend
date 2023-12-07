@@ -91,6 +91,22 @@ class Pintura{
           }
           this.id_pintura = result.insertId;
       }
+
+      static async getUserByPintura(id) {
+        const connection = await db.createConnection();
+        const [rows] = await connection.query(
+          "SELECT id_usuario FROM pinturas WHERE id_pintura=? AND deleted=0 ;",
+          [id]
+        );
+
+        connection.end();
+        if (rows.length > 0) {
+          const row = rows[0];
+          return row.id_usuario;
+        } else {
+          throw new Error("No se encontro el id de la pintura");
+        }
+      }
       
         static async deleteFisicoById(id) {
           const connection = await db.createConnection();

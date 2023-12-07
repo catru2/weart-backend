@@ -70,6 +70,7 @@ class Likes{
         }
         this.id_likes = result.insertId;
     }
+    
     static async deleteFisicoById(id){
         const connection = await db.createConnection();
         const [result] = await connection.execute(

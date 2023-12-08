@@ -2,7 +2,9 @@ const Likes = require("../models/likes.model");
 const Pinturas = require("../models/pintura.model");
 const Seguidores = require("../models/seguidores.model");
 const jwt = require("jsonwebtoken")
-const pusher = require("../configs/Pusher.config")
+const pusher = require("../configs/Pusher.config");
+const db = require("../configs/ConfiDB");
+
 const index = async (req, res) => {
     try {
         const limit = parseInt(req.query.limit);
@@ -81,6 +83,7 @@ const createLikeWithTransaction = async (req, res) =>{
     try{
         const token = req.cookies.token
         const decoded = await Likes.getTokenid(token);
+        const connection = await db.createConnection();
 
         await connection.beginTransaction();
 
@@ -90,6 +93,7 @@ const createLikeWithTransaction = async (req, res) =>{
             created_by: decoded.id,
             created_at : new Date()
         })
+
         const like = new Likes ({
             id_pintura: req.params.id,
             id_usuario: decoded.id,
